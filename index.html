@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChronoScope</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 100px; }
+    button { font-size: 1.2em; padding: 0.8em 1.6em; margin: 8px; }
+    #top-actions { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <img src="assets/ChronoScope.png" alt="Archaeologist Scanner Logo"
+       style="max-width:320px; width:48%; min-width:160px; margin-bottom:32px; display:block; margin-left:auto; margin-right:auto;">
+  <h1>Welcome to the ChronoScope!</h1>
+
+  <div id="top-actions">
+    <button id="startBtn">Start Scanning</button>
+    <button id="recentBtn">Recent Captures</button>
+  </div>
+
+  <script>
+    document.getElementById('startBtn').onclick = function() {
+      window.location.href = 'camera.html';
+    };
+    document.getElementById('recentBtn').onclick = function() {
+      window.location.href = 'recents.html';
+    };
+  </script>
+</body>
+</html>

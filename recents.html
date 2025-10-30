@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Recent Captures</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .top-nav {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:flex-start;
+      max-width:900px;
+      margin: 12px auto;
+    }
+    .nav-btn {
+      background:#fff;
+      border:1px solid #ddd;
+      padding:8px 12px;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:0.95rem;
+    }
+    .nav-link {
+      text-decoration:none;
+      display:inline-block;
+    }
+    .obs-list { max-width: 900px; margin: 24px auto; display: grid; gap: 12px; }
+    .obs-item { display:flex; gap:12px; align-items:flex-start; padding:12px; border-radius:8px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.06); transition: box-shadow .2s, transform .12s; }
+    .obs-item.highlight {
+      box-shadow: 0 6px 18px rgba(0,123,255,0.25);
+      transform: translateY(-4px);
+      border: 2px solid rgba(0,123,255,0.9);
+    }
+    .obs-item img { width:140px; height:140px; object-fit:cover; border-radius:6px; background:#eee; }
+    .obs-meta { flex:1; text-align:left; }
+    .obs-meta .title { font-weight:600; margin-bottom:6px; }
+    .obs-meta .small { color:#666; font-size:0.9em; }
+    .top-bar { text-align:center; margin:18px 0; }
+    a.button { display:inline-block; padding:8px 14px; background:#007bff; color:white; border-radius:6px; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <!-- added navigation -->
+  <div class="top-nav">
+    <button class="nav-btn" onclick="history.back()">← Back</button>
+    <a class="nav-btn nav-link" href="index.html">Home</a>
+  </div>
+
+  <div class="container">
+    <div class="top-bar">
+      <h2>Recent Captures</h2>
+      <!-- changed these to use nav-btn/nav-link so they match home page nav -->
+      <a class="nav-btn nav-link" href="index.html">← Home</a>
+      <a class="nav-btn nav-link" href="camera.html" style="margin-left:8px;">Open Camera</a>
+    </div>
+
+    <div id="observations" class="obs-list">
+      <div id="loading">Loading recent captures...</div>
+    </div>
+  </div>
+
+  <script src="observations.js"></script>
+</body>
+</html>

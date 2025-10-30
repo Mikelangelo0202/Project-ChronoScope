@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Artifcact Scanner</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 40px; }
+    video, img { max-width: 90vw; border: 2px solid #333; margin: 10px 0; }
+    #result { margin-top: 20px; font-size: 1.2em; }
+    button { font-size: 1em; padding: 0.5em 1em; }
+    .top-nav {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:flex-start;
+      max-width:900px;
+      margin:12px auto;
+    }
+    .nav-btn {
+      background:#fff;
+      border:1px solid #ddd;
+      padding:8px 12px;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:0.95rem;
+      text-decoration:none;
+      color:inherit;
+    }
+    .nav-link { text-decoration:none; color:inherit; display:inline-block; }
+  </style>
+</head>
+<body>
+  <!-- added navigation -->
+  <div class="top-nav">
+    <button class="nav-btn" onclick="history.back()">← Back</button>
+    <a class="nav-btn nav-link" href="index.html">Home</a>
+    <a class="nav-btn nav-link" href="recents.html">Recent Captures</a>
+  </div>
+
+  <h2>Artifact Scanner</h2>
+  <video id="video" autoplay playsinline></video>
+  <br>
+  <button id="capture">Capture Photo</button>
+  <br>
+  <canvas id="canvas" style="display:none;"></canvas>
+  <img id="photo" alt="Captured photo will appear here" />
+  <div id="result"></div>
+  <script src="main.js"></script>
+</body>
+</html>
