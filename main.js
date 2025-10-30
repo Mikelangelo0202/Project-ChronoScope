@@ -9,40 +9,85 @@ const resultDiv = document.getElementById('result');
 captureBtn.disabled = true;
 
 // Start camera
-async function startCamera() {
-  // disable capture until stream ready
+// call with 'user' for front/selfie or 'environment' for back
+async function startCamera(desiredFacing = 'user') {
   captureBtn.disabled = true;
 
-  // Try several constraints that prefer the front-facing (selfie) camera.
-  const tryConstraints = [
-    { video: { facingMode: { exact: "user" } } },   // strict
-    { video: { facingMode: "user" } },              // flexible
-    { video: { facingMode: { ideal: "user" } } },   // ideal
-    { video: true }                                 // any camera (fallback)
-  ];
+  // iOS Safari requires HTTPS or localhost for getUserMedia
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+    console.warn('getUserMedia may be blocked on insecure origin. Serve over HTTPS or use localhost.');
+  }
 
-  for (const constraints of tryConstraints) {
+  // helper to open stream with given constraints
+  async function openStream(constraints) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       video.srcObject = stream;
-
-      // Ensure video metadata is loaded before enabling capture
-      await new Promise((resolve) => {
+      await new Promise(resolve => {
         if (video.readyState >= 2) return resolve();
         video.addEventListener('loadedmetadata', resolve, { once: true });
       });
-
-      // enable capture now that camera is ready
       captureBtn.disabled = false;
-      return;
+      return true;
     } catch (err) {
-      console.warn('getUserMedia failed for constraints', constraints, err);
-      // try next constraints
+      console.warn('getUserMedia failed for', constraints, err);
+      return false;
     }
   }
 
-  alert('Could not access the front camera. Check permissions or try a different device.');
+  // 1) Try to get permission with a simple request so enumerateDevices returns labels
+  try {
+    await navigator.mediaDevices.getUserMedia({ video: true });
+  } catch (err) {
+    // user may deny — we'll still attempt other strategies below
+    console.warn('Initial permission request failed (labels may be hidden):', err);
+  }
+
+  // 2) Enumerate devices and try to pick the best match
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoInputs = devices.filter(d => d.kind === 'videoinput');
+
+    // try to find device by label heuristics (works after permission)
+    let chosen = null;
+    const want = desiredFacing === 'environment' ? ['back', 'rear', 'environment'] : ['front', 'face', 'user', 'selfie'];
+    for (const dev of videoInputs) {
+      const label = (dev.label || '').toLowerCase();
+      for (const key of want) {
+        if (label.includes(key)) {
+          chosen = dev.deviceId;
+          break;
+        }
+      }
+      if (chosen) break;
+    }
+
+    if (chosen) {
+      const ok = await openStream({ video: { deviceId: { exact: chosen } } });
+      if (ok) return;
+    }
+  } catch (err) {
+    console.warn('enumerateDevices failed or no matching device:', err);
+  }
+
+  // 3) Try facingMode constraint (may not be supported on all iOS versions)
+  const facingConstraints = [
+    { video: { facingMode: { exact: desiredFacing } } },
+    { video: { facingMode: { ideal: desiredFacing } } },
+    { video: { facingMode: desiredFacing } }
+  ];
+  for (const c of facingConstraints) {
+    if (await openStream(c)) return;
+  }
+
+  // 4) Final fallback to any camera
+  if (await openStream({ video: true })) return;
+
+  alert('Could not access a camera on this device. Check permissions and that the browser supports getUserMedia.');
 }
+
+// default call (change 'user' to 'environment' if you want the back camera)
+startCamera('user');
 
 // Capture photo and return a Blob
 function capturePhotoBlob() {
@@ -104,5 +149,3 @@ captureBtn.addEventListener('click', async () => {
     // upload in background and update resultDiv when done
     await sendToServer(blob);
 });
-
-startCamera();
