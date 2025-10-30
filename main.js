@@ -10,7 +10,7 @@ captureBtn.disabled = true;
 
 // Start camera
 // call with 'user' for front/selfie or 'environment' for back
-async function startCamera(desiredFacing = 'user') {
+async function startCamera(desiredFacing = 'environment') {
   captureBtn.disabled = true;
 
   // iOS Safari requires HTTPS or localhost for getUserMedia
