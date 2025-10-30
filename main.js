@@ -10,24 +10,38 @@ captureBtn.disabled = true;
 
 // Start camera
 async function startCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
+  // disable capture until stream ready
+  captureBtn.disabled = true;
 
-        // enable capture once metadata is available
-        video.addEventListener('loadedmetadata', () => {
-            // some devices may report 0 for videoWidth until metadata loads
-            if (video.videoWidth && video.videoHeight) {
-                captureBtn.disabled = false;
-            } else {
-                // still enable as a fallback
-                captureBtn.disabled = false;
-            }
-        }, { once: true });
+  // Try several constraints that prefer the front-facing (selfie) camera.
+  const tryConstraints = [
+    { video: { facingMode: { exact: "user" } } },   // strict
+    { video: { facingMode: "user" } },              // flexible
+    { video: { facingMode: { ideal: "user" } } },   // ideal
+    { video: true }                                 // any camera (fallback)
+  ];
+
+  for (const constraints of tryConstraints) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      video.srcObject = stream;
+
+      // Ensure video metadata is loaded before enabling capture
+      await new Promise((resolve) => {
+        if (video.readyState >= 2) return resolve();
+        video.addEventListener('loadedmetadata', resolve, { once: true });
+      });
+
+      // enable capture now that camera is ready
+      captureBtn.disabled = false;
+      return;
     } catch (err) {
-        alert('Could not access camera: ' + err.message);
-        console.error('startCamera error:', err);
+      console.warn('getUserMedia failed for constraints', constraints, err);
+      // try next constraints
     }
+  }
+
+  alert('Could not access the front camera. Check permissions or try a different device.');
 }
 
 // Capture photo and return a Blob
