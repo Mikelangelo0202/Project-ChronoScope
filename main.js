@@ -87,7 +87,7 @@ async function startCamera(desiredFacing = 'environment') {
 }
 
 // default call (change 'user' to 'environment' if you want the back camera)
-startCamera('user');
+startCamera('environment');
 
 // Capture photo and return a Blob
 function capturePhotoBlob() {
